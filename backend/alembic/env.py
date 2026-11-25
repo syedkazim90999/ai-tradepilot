@@ -21,8 +21,10 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     url = get_settings().database_url
-    # Alembic offline needs a sync URL.
-    url = url.replace("+aiosqlite", "").replace("+psycopg", "")
+    # Alembic offline needs a sync URL. Only the async SQLite driver
+    # suffix is stripped; postgresql+psycopg:// is already usable
+    # synchronously (psycopg3), so it must be kept.
+    url = url.replace("+aiosqlite", "")
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True,
                       dialect_opts={"paramstyle": "named"})
     with context.begin_transaction():

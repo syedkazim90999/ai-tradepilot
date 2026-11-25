@@ -1,0 +1,30 @@
+# Render Blueprint for AI TradePilot (free plan).
+# Linked from the GitHub repo: Render reads this file when the repo is connected.
+# Secrets (DATABASE_URL, REDIS_URL, SECRET_KEY, FERNET_KEY, CORS_ORIGINS) are
+# set in the Render dashboard, never in this file.
+# The preDeployCommand runs database migrations on Render itself, because the
+# build machine cannot open a direct PostgreSQL connection (network restriction).
+services:
+  - type: web
+    name: tradepilot-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    preDeployCommand: alembic upgrade head
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: BINANCE_USE_TESTNET
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FERNET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
