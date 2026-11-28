@@ -107,3 +107,47 @@ def test_celery_beat_schedule_lists_scanner_and_reconcile():
     assert "scanner-every-5-min" in beat
     assert "reconcile-positions-every-15-min" in beat
     assert beat["scanner-every-5-min"]["task"] == "app.worker.tasks.run_scanner"
+
+
+def test_celery_redis_broker_forces_resp2_for_rediss_url():
+    """With a rediss:// (Upstash) broker URL the Celery broker must use
+    RESP2 (protocol=2). redis-py 6.x otherwise negotiates RESP3
+    (HELLO 3 + AUTH) and Upstash's TCP endpoint rejects that handshake
+    as 'invalid username-password pair' even with correct credentials.
+    The protocol cannot be set via ?protocol=2 in the URL (kombu's
+    Connection._init_params rejects it), so it is declared in
+    broker_transport_options and injected into the redis pool kwargs by
+    the Channel._connparams patch in app/worker/celery_app.py.
+    Built the way kombu builds the pool, without connecting.
+    """
+    import redis
+    from celery import Celery
+    from kombu.transport.redis import Channel
+
+    from app.worker.celery_app import celery_app
+
+    # 1. The app's own config declares protocol 2.
+    assert celery_app.conf.broker_transport_options.get("protocol") == 2
+
+    # 2. A rediss:// broker resolves to protocol 2 in the pool kwargs.
+    probe = Celery(
+        "resp2-probe",
+        broker="rediss://celery:testpass@flowing-elk-220644.upstash.io:6379"
+               "?ssl_cert_reqs=CERT_REQUIRED",
+        backend="rediss://celery:testpass@flowing-elk-220644.upstash.io:6379"
+                "?ssl_cert_reqs=CERT_REQUIRED",
+    )
+    probe.conf.update(broker_transport_options={"protocol": 2})
+    conn = probe.connection()
+    channel = Channel.__new__(Channel)
+    channel.connection = conn.transport
+    params = channel._connparams()
+    assert params.get("protocol") == 2
+    assert params.get("username") == "celery"
+    assert params.get("connection_class") is redis.SSLConnection
+
+    # 3. A pool built from those kwargs negotiates RESP2.
+    pool = redis.ConnectionPool(**params)
+    assert pool.get_protocol() == 2
+    connection = pool.connection_class(**pool.connection_kwargs)
+    assert connection.protocol == 2
