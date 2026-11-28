@@ -61,7 +61,7 @@ def test_user_cannot_change_other_users_bot_settings(client):
                json={"risk_per_trade_pct": 1.5, "max_positions": 5})
     mine = client.get("/api/v1/bot/settings", headers=auth_headers(tok_a)).json()
     assert float(mine["risk_per_trade_pct"]) == 0.5
-    assert mine["max_positions"] == 2
+    assert mine["max_positions"] == 5
 
 
 def test_connection_response_masks_key_and_never_leaks_secret(client):

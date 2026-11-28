@@ -87,7 +87,7 @@ export default function BotPage() {
                 The scanner only ever generates rule-based signals — no model places orders on your behalf.
               </p>
               <div className="rounded-lg border border-border bg-[#0D1424] p-3 text-xs leading-relaxed text-muted">
-                Defaults: 0.5% risk/trade · 2% daily loss limit · max 2 positions · leverage 10–50x (default 20x) · 2:1 reward/risk. A stop-loss is attached to every trade.
+                Defaults: 0.5% risk/trade · max 5 positions · leverage 10–50x (default 20x) · 2:1 reward/risk. A stop-loss is attached to every trade — there is no daily loss halt, the bot keeps trading.
               </div>
             </CardContent>
           </Card>

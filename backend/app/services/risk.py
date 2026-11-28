@@ -1,14 +1,15 @@
-"""Risk engine — conservative Testnet defaults.
-Enforced before every order; blocks are logged as risk_events."""
+"""Risk engine — Testnet defaults.
+Enforced before every order; blocks are logged as risk_events.
+There is intentionally NO daily-loss halt: the per-trade stop loss is the
+loss control, and the bot keeps trading through losing days."""
 from dataclasses import dataclass
-from datetime import date
 from decimal import Decimal
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.models import BotSettings, Position, RiskEvent, Trade
+from app.models import BotSettings, Position, RiskEvent
 
 
 @dataclass
@@ -53,18 +54,6 @@ async def is_global_stop_active(db: AsyncSession) -> bool:
     return bool(row and row.value.lower() == "true")
 
 
-async def daily_realized_pnl(db: AsyncSession, user_id) -> Decimal:
-    today = date.today()
-    result = await db.execute(
-        select(func.coalesce(func.sum(Trade.realized_pnl), 0)).where(
-            Trade.user_id == user_id,
-            Trade.closed_at.is_not(None),
-            func.date(Trade.closed_at) == today,
-        )
-    )
-    return Decimal(str(result.scalar() or 0))
-
-
 async def check_trade_allowed(db: AsyncSession, user_id, symbol: str, equity: Decimal,
                               entry: Decimal, stop_loss: Decimal,
                               leverage: int) -> RiskDecision:
@@ -95,12 +84,8 @@ async def check_trade_allowed(db: AsyncSession, user_id, symbol: str, equity: De
                              f"Already at max positions ({settings.max_positions})", symbol)
         return RiskDecision(False, f"Max positions ({settings.max_positions}) reached")
 
-    pnl_today = await daily_realized_pnl(db, user_id)
-    daily_limit = equity * settings.daily_loss_limit_pct / 100
-    if pnl_today < 0 and abs(pnl_today) >= daily_limit:
-        await log_risk_event(db, user_id, "daily_loss_limit",
-                             f"Daily loss {pnl_today} reached limit {daily_limit}", symbol)
-        return RiskDecision(False, "Daily loss limit reached")
+    # NOTE: no daily-loss halt by design. A losing day does not stop the bot;
+    # each trade's loss is capped by its own stop loss.
 
     # Position sizing: risk_amount = equity * risk% ; size = risk / |entry - stop|
     risk_amount = equity * settings.risk_per_trade_pct / 100

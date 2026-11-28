@@ -111,7 +111,7 @@ class BotSettings(Base):
     is_paused: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     risk_per_trade_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("0.50"), nullable=False)
     daily_loss_limit_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("2.00"), nullable=False)
-    max_positions: Mapped[int] = mapped_column(Integer, default=2, nullable=False)
+    max_positions: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
     max_leverage: Mapped[int] = mapped_column(Integer, default=20, nullable=False)
     reward_risk_ratio: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("2.00"), nullable=False)
     trading_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

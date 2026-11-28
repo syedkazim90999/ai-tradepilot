@@ -105,10 +105,13 @@ def test_position_size_capped_by_leverage(client):
     assert d.position_size * Decimal("60000") <= Decimal("2000")
 
 
-def test_daily_loss_block(client):
+def test_daily_loss_no_longer_blocks(client):
+    """No daily-loss halt by design: even after losing 2.5% of equity today,
+    the next trade is still allowed. The per-trade stop loss is the loss
+    control, and the bot keeps trading through losing days."""
     email, _, tok, _ = register_and_login(client)
     user_id = get_user(email).id
-    # Lose 2% of 10000 = 200 today -> at/over the daily limit.
+    # Lose 2.5% of 10000 = 250 today — over the old 2% daily limit.
     seed_rows([make_closed_trade(user_id, pnl="-250")])
 
     async def _check():
@@ -117,8 +120,8 @@ def test_daily_loss_block(client):
             return await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10000"),
                                              Decimal("60000"), Decimal("59000"), 2)
     d = run(_check())
-    assert d.allowed is False
-    assert "Daily loss" in d.reason
+    assert d.allowed is True
+    assert d.position_size == Decimal("0.05")
 
 
 def test_daily_loss_below_limit_allows(client):
@@ -137,11 +140,18 @@ def test_daily_loss_below_limit_allows(client):
 def test_max_positions_block(client):
     email, _, tok, _ = register_and_login(client)
     user_id = get_user(email).id
+    # Default max is 5 positions — 5 open positions must block the next one.
     seed_rows([
         Position(user_id=user_id, symbol="BTCUSDT", side="LONG", quantity=Decimal("0.1"),
                  entry_price=Decimal("60000")),
         Position(user_id=user_id, symbol="ETHUSDT", side="LONG", quantity=Decimal("1"),
                  entry_price=Decimal("3000")),
+        Position(user_id=user_id, symbol="BNBUSDT", side="LONG", quantity=Decimal("1"),
+                 entry_price=Decimal("600")),
+        Position(user_id=user_id, symbol="SOLUSDT", side="LONG", quantity=Decimal("1"),
+                 entry_price=Decimal("150")),
+        Position(user_id=user_id, symbol="XRPUSDT", side="LONG", quantity=Decimal("10"),
+                 entry_price=Decimal("2")),
     ])
 
     async def _check():
