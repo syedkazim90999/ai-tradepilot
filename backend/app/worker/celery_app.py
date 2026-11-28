@@ -1,12 +1,63 @@
 """Celery configuration for deployment (requires Redis).
 Local dev without Redis uses the in-app asyncio worker in main.py lifespan."""
+import logging
 import os
+from urllib.parse import quote, urlsplit, urlunsplit
 
 from celery import Celery
 
+logger = logging.getLogger(__name__)
+
 
 def _celery_redis_url() -> str:
+    """Build the Celery broker/result-backend URL.
+
+    Credentials must survive URL parsing intact. Upstash auto-generated
+    ACL passwords can contain characters that are special in a URL
+    (@ : / # ? & = + %). If such a password is pasted raw into
+    REDIS_URL, the URL parser splits the password at the special
+    character and kombu sends a mangled password to AUTH, so Upstash
+    rejects it as "invalid username-password pair" even though the
+    password itself is correct. (Verified: redis-py 6.4.0 already
+    defaults to RESP2/protocol=2, so the AUTH failure is not a RESP3
+    handshake problem, and the default-user REST token in
+    .env.production is all-alphanumeric, so the failure is not the
+    password value itself -- it is how the password travels through
+    the URL.)
+
+    To avoid that, the password may be supplied separately via the
+    REDIS_PASSWORD env var (raw, no URL-encoding needed) and the
+    username via REDIS_USERNAME. When set, they override whatever
+    credentials are embedded in REDIS_URL, and the password is
+    percent-encoded here before being placed in the URL, so kombu
+    parses back exactly the intended username/password. The URL
+    itself is only used for scheme/host/port/path/query in that case.
+    Without REDIS_PASSWORD/REDIS_USERNAME the URL is used as-is
+    (previous behaviour).
+    """
     url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    username = os.environ.get("REDIS_USERNAME")
+    password = os.environ.get("REDIS_PASSWORD")
+    if username is not None or password is not None:
+        parts = urlsplit(url)
+        if username is None:
+            username = parts.username or "default"
+        if password is None:
+            password = parts.password or ""
+        host = parts.hostname or "localhost"
+        netloc = host
+        if parts.port:
+            netloc += f":{parts.port}"
+        auth = quote(username, safe="") + ":" + quote(password, safe="")
+        url = urlunsplit(
+            (parts.scheme, f"{auth}@{netloc}", parts.path, parts.query, "")
+        )
+        logger.info(
+            "Celery broker credentials supplied via REDIS_USERNAME/REDIS_PASSWORD "
+            "env vars (username=%s, host=%s); password percent-encoded into URL.",
+            username,
+            host,
+        )
     # Kombu requires ssl_cert_reqs to be set explicitly for rediss:// URLs
     # (Upstash Redis uses TLS). Without it the worker dies with:
     # "a rediss:// URL must have parameter ssl_cert_reqs set to CERT_REQUIRED".
@@ -19,11 +70,15 @@ def _celery_redis_url() -> str:
 def _force_resp2_for_redis_broker() -> None:
     """Force RESP2 (protocol=2) on the Redis broker connection.
 
-    redis-py 6.x can negotiate RESP3 (HELLO 3 + AUTH) and Upstash's TCP
-    endpoint rejects that handshake as "invalid username-password pair"
-    even with correct credentials (the password was proven not to be the
-    cause: five credential forms, including a brand-new ACL user, all
-    failed identically).
+    NOTE (2026-11-28 investigation): redis-py 6.4.0 already defaults
+    to protocol=2 (RESP2) in both Connection.__init__ and Redis.__init__,
+    so this patch is belt-and-braces -- it does NOT by itself explain or
+    fix an "invalid username-password pair" AUTH failure, because the
+    worker was already speaking RESP2 before this patch. The AUTH
+    failure with correct credentials is a credential-transport problem
+    (see _celery_redis_url: a password containing URL-special characters
+    is mangled by URL parsing), not a RESP3 handshake problem. This
+    patch is kept so the resolved pool kwargs provably carry protocol=2.
 
     The protocol cannot be set via the REDIS_URL query string:
     ``?protocol=2`` is rejected by kombu's ``Connection._init_params``

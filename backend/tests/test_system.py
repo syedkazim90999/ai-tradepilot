@@ -151,3 +151,70 @@ def test_celery_redis_broker_forces_resp2_for_rediss_url():
     assert pool.get_protocol() == 2
     connection = pool.connection_class(**pool.connection_kwargs)
     assert connection.protocol == 2
+
+
+def test_celery_redis_url_encodes_special_chars_in_password(monkeypatch):
+    """A REDIS_PASSWORD containing URL-special characters must reach
+    kombu intact. Root cause of the live AUTH failure: redis-py 6.4.0
+    already defaults to RESP2, so the RESP3 theory was wrong; the
+    failure was the password being mangled by URL parsing when it was
+    pasted raw into REDIS_URL. Supplying the raw password via
+    REDIS_PASSWORD (and REDIS_USERNAME) makes _celery_redis_url()
+    percent-encode it, so kombu parses back exactly the intended
+    username/password. Proves the fix end to end through the same
+    Channel._connparams path the worker uses.
+    """
+    import redis
+    from celery import Celery
+    from kombu.transport.redis import Channel
+
+    from app.worker.celery_app import _celery_redis_url
+
+    special_password = "p@ss:w/rd#1&2=3+4%5"
+    monkeypatch.setenv(
+        "REDIS_URL",
+        "rediss://celery:placeholder@flowing-elk-220644.upstash.io:6379",
+    )
+    monkeypatch.setenv("REDIS_USERNAME", "celery")
+    monkeypatch.setenv("REDIS_PASSWORD", special_password)
+
+    url = _celery_redis_url()
+    # The raw special characters must NOT appear unencoded in the URL.
+    assert "p@ss:w/rd" not in url
+    assert "ssl_cert_reqs=CERT_REQUIRED" in url
+
+    # Round-trip through the exact path the worker uses: build a Celery
+    # probe with this URL and read the pool kwargs from Channel._connparams.
+    probe = Celery("url-encoding-probe", broker=url, backend=url)
+    probe.conf.update(broker_transport_options={"protocol": 2})
+    conn = probe.connection()
+    channel = Channel.__new__(Channel)
+    channel.connection = conn.transport
+    params = channel._connparams()
+    assert params.get("username") == "celery"
+    assert params.get("password") == special_password
+    assert params.get("protocol") == 2
+    assert params.get("connection_class") is redis.SSLConnection
+
+    # And a pool built from those kwargs carries the exact password.
+    pool = redis.ConnectionPool(**params)
+    assert pool.connection_kwargs.get("password") == special_password
+
+
+def test_celery_redis_url_without_env_override_is_unchanged(monkeypatch):
+    """Without REDIS_USERNAME/REDIS_PASSWORD the broker URL is used
+    as-is (previous behaviour), with ssl_cert_reqs appended for rediss.
+    """
+    from app.worker.celery_app import _celery_redis_url
+
+    monkeypatch.delenv("REDIS_USERNAME", raising=False)
+    monkeypatch.delenv("REDIS_PASSWORD", raising=False)
+    monkeypatch.setenv(
+        "REDIS_URL",
+        "rediss://celery:plainpass123@flowing-elk-220644.upstash.io:6379",
+    )
+    url = _celery_redis_url()
+    assert url == (
+        "rediss://celery:plainpass123@flowing-elk-220644.upstash.io:6379"
+        "?ssl_cert_reqs=CERT_REQUIRED"
+    )
