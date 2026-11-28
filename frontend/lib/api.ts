@@ -150,8 +150,6 @@ export interface StrategiesPerformance {
   total_trades: number; closed_trades: number; win_rate: number | null;
   realized_pnl: number; strategies: StrategyPerformanceRow[];
 }
-export interface Plan { name: string; price_usd: number; max_positions: number; max_leverage: number; scanner: boolean; auto_trading: boolean; }
-export interface MySubscription { plan: string; status: string; started_at: string | null; expires_at: string | null; features: Plan; }
 export interface HealthStatus { status: string; database: string; worker: string; exchange_reachable: boolean; testnet: boolean; }
 export interface AdminOverview { total_users: number; active_bots: number; open_positions: number; total_trades: number; suspended_users: number; connected_binance_accounts: number; total_trading_volume: number; aggregate_realized_pnl: number; }
 export interface AdminUserOut {
@@ -219,8 +217,6 @@ export const userApi = {
   markNotificationRead: (id: string) => apiFetch<{ detail: string }>(`/api/v1/notifications/${id}/read`, { method: "POST" }),
   scannerRun: (symbols?: string) => apiFetch<{ scanned: string[]; signals_generated: number; signals: { symbol: string; direction: string; timeframe: string }[] }>(`/api/v1/scanner/run${symbols ? `?symbols=${encodeURIComponent(symbols)}` : ""}`),
   scannerStatus: () => apiFetch<{ status: string; last_signal_at: string | null; default_symbols: string[] }>("/api/v1/scanner/status"),
-  plans: () => apiFetch<Plan[]>("/api/v1/subscriptions/plans"),
-  mySubscription: () => apiFetch<MySubscription>("/api/v1/subscriptions/me"),
 };
 
 // ---------------------------------------------------------------- admin

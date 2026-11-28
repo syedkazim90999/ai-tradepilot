@@ -87,7 +87,7 @@ export default function BotPage() {
                 The scanner only ever generates rule-based signals — no model places orders on your behalf.
               </p>
               <div className="rounded-lg border border-border bg-[#0D1424] p-3 text-xs leading-relaxed text-muted">
-                Defaults: 0.5% risk/trade · 2% daily loss limit · max 2 positions · max 2x leverage · 2:1 reward/risk.
+                Defaults: 0.5% risk/trade · 2% daily loss limit · max 2 positions · leverage 10–50x (default 20x) · 2:1 reward/risk. A stop-loss is attached to every trade.
               </div>
             </CardContent>
           </Card>
@@ -98,7 +98,7 @@ export default function BotPage() {
                 <div className="space-y-2"><Label htmlFor="risk">Risk per trade (%)</Label><Input id="risk" type="number" step="0.1" min="0.1" max="5" value={Number(s.risk_per_trade_pct)} onChange={(e) => set("risk_per_trade_pct", Number(e.target.value))} /></div>
                 <div className="space-y-2"><Label htmlFor="daily">Daily loss limit (%)</Label><Input id="daily" type="number" step="0.1" min="0.5" max="20" value={Number(s.daily_loss_limit_pct)} onChange={(e) => set("daily_loss_limit_pct", Number(e.target.value))} /></div>
                 <div className="space-y-2"><Label htmlFor="maxpos">Max positions (1–10)</Label><Input id="maxpos" type="number" min={1} max={10} value={s.max_positions} onChange={(e) => set("max_positions", Number(e.target.value))} /></div>
-                <div className="space-y-2"><Label htmlFor="lev">Max leverage (1–20x)</Label><Input id="lev" type="number" min={1} max={20} value={s.max_leverage} onChange={(e) => set("max_leverage", Number(e.target.value))} /></div>
+                <div className="space-y-2"><Label htmlFor="lev">Max leverage (10–50x)</Label><Input id="lev" type="number" min={10} max={50} value={s.max_leverage} onChange={(e) => set("max_leverage", Number(e.target.value))} /></div>
                 <div className="space-y-2"><Label htmlFor="rr">Reward / risk ratio</Label><Input id="rr" type="number" step="0.1" min="0.5" max="5" value={Number(s.reward_risk_ratio)} onChange={(e) => set("reward_risk_ratio", Number(e.target.value))} /></div>
                 <div className="space-y-2"><Label htmlFor="symbols">Symbols (comma-separated)</Label><Input id="symbols" value={symbolsText} onChange={(e) => setSymbolsText(e.target.value)} placeholder="BTCUSDT, ETHUSDT" /></div>
                 <div className="sm:col-span-2 flex flex-wrap gap-2">

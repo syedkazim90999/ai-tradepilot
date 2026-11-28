@@ -8,7 +8,7 @@ const FAQS = [
   { q: "How are my Binance API keys stored?", a: "They are encrypted with Fernet before being stored in the database. The dashboard only ever shows the last 4 characters of your key. Keys with withdrawal permission are refused during validation." },
   { q: "What happens if the bot loses money?", a: "Losses are limited by your configuration: risk per trade, daily loss limit, max positions and leverage caps. A daily loss limit stops new trades for the day, and you can pause the bot at any time." },
   { q: "Can I use my own strategy?", a: "Today the scanner uses a fixed set of indicators (RSI, MACD, EMA, Bollinger Bands, ATR, VWAP) with configurable risk parameters. Custom strategies are not yet supported." },
-  { q: "What plans are available?", a: "Free ($0), Basic ($19/mo), Pro ($49/mo) and Premium ($99/mo). The Free plan includes the scanner but not auto-trading. Paid checkout is coming soon — registering now gives you the Free plan." },
+  { q: "Are there any plans or payments?", a: "No. There are no subscription plans and nothing to pay — every account gets full access, including automatic AI trading, leverage 10–50x and a stop-loss on every trade." },
   { q: "How do I cancel or delete my account?", a: "You can stop the bot and disconnect Binance at any time from the dashboard. For account deletion, contact support from your registered email." },
   { q: "Is AI TradePilot financial advice?", a: "No. Signals and automation are tools, not advice. You are responsible for your own trading decisions and for understanding the risks." },
   { q: "Which markets does it trade?", a: "Binance Futures (USDT-margined perpetuals) on the symbols you configure, starting with the scanner's default symbol set." },

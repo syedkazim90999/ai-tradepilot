@@ -1,5 +1,5 @@
-"""Bot settings + start/stop, signals, dashboard, trades, notifications, scanner,
-subscriptions — user-facing routes."""
+"""Bot settings + start/stop, signals, dashboard, trades, notifications, scanner
+— user-facing routes."""
 import uuid
 from datetime import datetime, timezone
 
@@ -11,10 +11,10 @@ from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models import (
     BotSettings, ExchangeConnection, MarketSignal, Notification, Order, Position,
-    Subscription, Trade, User,
+    Trade, User,
 )
 from app.schemas import (
-    PLANS, BotSettingsIn, BotSettingsOut, NotificationOut, OrderOut,
+    BotSettingsIn, BotSettingsOut, NotificationOut, OrderOut,
     PositionOut, SignalOut, TradeOut,
 )
 from app.services.notifications import notify
@@ -222,22 +222,3 @@ async def scanner_status(current: User = Depends(get_current_user), db: AsyncSes
     return {"status": "idle",
             "last_signal_at": latest.created_at.isoformat() if latest else None,
             "default_symbols": DEFAULT_SYMBOLS}
-
-
-# --- Subscriptions ---
-@router.get("/subscriptions/plans")
-async def list_plans(current: User = Depends(get_current_user)):
-    return [{"name": name, **details} for name, details in PLANS.items()]
-
-
-@router.get("/subscriptions/me")
-async def my_subscription(current: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    sub = (await db.execute(
-        select(Subscription).where(Subscription.user_id == current.id))).scalar_one_or_none()
-    if not sub:
-        sub = Subscription(user_id=current.id, plan="Free", status="active")
-        db.add(sub)
-        await db.commit()
-        await db.refresh(sub)
-    return {"plan": sub.plan, "status": sub.status, "started_at": sub.started_at,
-            "expires_at": sub.expires_at, "features": PLANS.get(sub.plan, PLANS["Free"])}

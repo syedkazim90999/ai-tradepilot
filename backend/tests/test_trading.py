@@ -161,11 +161,43 @@ def test_leverage_over_max_blocked(client):
     async def _check():
         from tests.conftest import _Session
         async with _Session() as s:
+            # 60x is above the absolute 50x cap, so it must be blocked.
             return await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10000"),
-                                             Decimal("60000"), Decimal("59000"), 10)
+                                             Decimal("60000"), Decimal("59000"), 60)
     d = run(_check())
     assert d.allowed is False
     assert "Leverage" in d.reason
+
+
+def test_leverage_clamped_to_10_50_range(client):
+    """Legacy 2x settings clamp up to 10x; requests above 50x stay blocked."""
+    email, _, tok, _ = register_and_login(client)
+    user_id = get_user(email).id
+    mock = _mock_client()
+
+    async def _legacy(s):
+        from app.services.risk import get_effective_settings
+        # Creates the settings row (default 20x), then simulate a pre-change row.
+        settings = await get_effective_settings(s, user_id)
+        settings.max_leverage = 2
+        await s.commit()
+        # 10x (the clamped floor) must be allowed, not blocked by the stale 2x.
+        d = await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10000"),
+                                      Decimal("60000"), Decimal("59000"), 10)
+        assert d.allowed is True
+        # Executing a signal stores the trade at 10x, not 2x.
+        eng = TradingEngine(s, mock, user_id)
+        sig = make_signal()
+        s.add(sig)
+        await s.commit()
+        trade = await eng.execute_signal(sig, Decimal("10000"))
+        assert trade is not None
+        assert trade.leverage == 10
+        # A 60x request is still blocked (above the 50x cap).
+        d2 = await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10000"),
+                                       Decimal("60000"), Decimal("59000"), 60)
+        assert d2.allowed is False
+    run(_run_engine(_legacy, user_id))
 
 
 # --- trading engine (mocked exchange) ---

@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Order, Position, SystemSetting, Trade
 from app.services.binance_client import BinanceClient, BinanceError
-from app.services.risk import check_trade_allowed
+from app.services.risk import check_trade_allowed, get_effective_settings
 
 
 def deterministic_client_order_id(user_id, signal_id, symbol: str, side: str, order_type: str) -> str:
@@ -138,7 +138,11 @@ class TradingEngine:
         if signal.direction == "WAIT":
             return None
         side = "BUY" if signal.direction == "LONG" else "SELL"
-        settings_leverage = 2
+        # Leverage is always kept within 10x–50x: the user's configured max
+        # leverage, clamped. (Pre-existing settings rows may still hold the
+        # old 2x default, so the lower clamp matters.)
+        settings = await get_effective_settings(self.db, self.user_id)
+        settings_leverage = min(max(settings.max_leverage, 10), 50)
         decision = await check_trade_allowed(
             self.db, self.user_id, signal.symbol, equity,
             Decimal(str(signal.entry_price)), Decimal(str(signal.stop_loss)), settings_leverage)

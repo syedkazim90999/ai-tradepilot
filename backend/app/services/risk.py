@@ -79,10 +79,13 @@ async def check_trade_allowed(db: AsyncSession, user_id, symbol: str, equity: De
         await log_risk_event(db, user_id, "bot_paused", "Bot is paused for this user", symbol)
         return RiskDecision(False, "Bot is paused")
 
-    if leverage > settings.max_leverage:
+    # Effective max leverage is always kept within 10x–50x, so a stored
+    # pre-change default (2x) can never block a trade executed at 10x+.
+    effective_max_leverage = min(max(settings.max_leverage, 10), 50)
+    if leverage > effective_max_leverage:
         await log_risk_event(db, user_id, "leverage_exceeded",
-                             f"Requested leverage {leverage}x exceeds max {settings.max_leverage}x", symbol)
-        return RiskDecision(False, f"Leverage {leverage}x exceeds max {settings.max_leverage}x")
+                             f"Requested leverage {leverage}x exceeds max {effective_max_leverage}x", symbol)
+        return RiskDecision(False, f"Leverage {leverage}x exceeds max {effective_max_leverage}x")
 
     open_count = (await db.execute(
         select(func.count()).select_from(Position).where(

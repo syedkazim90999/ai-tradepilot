@@ -15,8 +15,8 @@ export default function TermsPage() {
       <p>You are responsible for keeping your account credentials confidential and for the API keys you connect. Connect only keys without withdrawal permission. You may disconnect a key at any time. We encrypt keys at rest and never display them in full.</p>
       <h2 className="text-xl font-semibold text-white">6. Acceptable use</h2>
       <p>You must not use the service to violate any law, to abuse the Binance API, or to interfere with other users. We may suspend accounts that breach these terms or that pose a risk to the platform.</p>
-      <h2 className="text-xl font-semibold text-white">7. Plans and payment</h2>
-      <p>Plans are billed month-to-month where payment is available. Paid checkout is not yet live; until it is, all accounts use the Free plan. A paid plan purchases platform features only — never trading profits.</p>
+      <h2 className="text-xl font-semibold text-white">7. No plans or payments</h2>
+      <p>There are no subscription plans and no payments. Every account gets full access to all features — including automatic AI trading — at no cost.</p>
       <h2 className="text-xl font-semibold text-white">8. Limitation of liability</h2>
       <p>To the maximum extent permitted by law, AI TradePilot is not liable for trading losses, lost profits, or damages arising from use of the service, including from signal errors, execution delays, exchange outages or software defects.</p>
       <h2 className="text-xl font-semibold text-white">9. Changes</h2>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Bell, Bot, CandlestickChart, CreditCard, KeyRound, LayoutDashboard, LogOut,
+  Bell, Bot, CandlestickChart, KeyRound, LayoutDashboard, LogOut,
   Menu, Radio, Settings, ShieldCheck, Signal, Wallet, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,6 @@ const NAV = [
   { href: "/dashboard/trades", label: "Trade History", icon: Wallet },
   { href: "/dashboard/positions", label: "Positions", icon: Radio },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
-  { href: "/dashboard/subscription", label: "Subscription", icon: CreditCard },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

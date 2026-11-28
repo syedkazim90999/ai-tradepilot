@@ -102,7 +102,7 @@ class BotSettingsIn(BaseModel):
     risk_per_trade_pct: Decimal | None = None
     daily_loss_limit_pct: Decimal | None = None
     max_positions: int | None = Field(default=None, ge=1, le=10)
-    max_leverage: int | None = Field(default=None, ge=1, le=20)
+    max_leverage: int | None = Field(default=None, ge=10, le=50)
     reward_risk_ratio: Decimal | None = None
     trading_enabled: bool | None = None
     symbols: list[str] | None = None
@@ -244,15 +244,6 @@ class MaintenanceIn(BaseModel):
 class LiveTradingActivation(BaseModel):
     confirm: bool = False
     acknowledgement: str = ""
-
-
-# --- Subscriptions ---
-PLANS = {
-    "Free": {"price_usd": 0, "max_positions": 1, "max_leverage": 2, "scanner": True, "auto_trading": False},
-    "Basic": {"price_usd": 19, "max_positions": 2, "max_leverage": 3, "scanner": True, "auto_trading": True},
-    "Pro": {"price_usd": 49, "max_positions": 5, "max_leverage": 5, "scanner": True, "auto_trading": True},
-    "Premium": {"price_usd": 99, "max_positions": 10, "max_leverage": 10, "scanner": True, "auto_trading": True},
-}
 
 
 # --- Profile / password / 2FA (gap closures, 2026-11-25) ---

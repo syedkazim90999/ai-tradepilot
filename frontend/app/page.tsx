@@ -8,8 +8,8 @@ import { Alert } from "@/components/ui/alert";
 
 const FEATURES = [
   { icon: Radar, title: "Market scanner", text: "Scans Binance Futures symbols with RSI, MACD, EMA, Bollinger Bands, ATR and VWAP to surface rule-based signals." },
-  { icon: Bot, title: "Automated bot", text: "Executes signals with conservative risk defaults: 0.5% risk per trade, 2% daily loss limit, max 2 positions." },
-  { icon: ShieldCheck, title: "Risk management first", text: "Stop-loss and take-profit on every trade, leverage caps, and a global pause. No LLM ever places an order." },
+  { icon: Bot, title: "Automated bot", text: "Executes signals automatically with 0.5% risk per trade, 2% daily loss limit, max 2 positions, leverage 10–50x and a stop-loss on every trade." },
+  { icon: ShieldCheck, title: "Risk management first", text: "Stop-loss and take-profit on every trade, leverage 10–50x, and a global pause. No LLM ever places an order." },
   { icon: KeyRound, title: "Encrypted API keys", text: "Your Binance keys are encrypted at rest, shown masked, and withdrawal permission is refused on validation." },
   { icon: BarChart3, title: "Trade analytics", text: "Realized P&L, trade history, open positions and signal history — all from your own account data." },
   { icon: Wallet, title: "Testnet by default", text: "Practice on Binance Futures Testnet with no real money at risk. Production trading stays disabled until explicitly activated." },
@@ -19,7 +19,7 @@ const FAQS = [
   { q: "Is my money at risk?", a: "On Testnet, no — you trade with test funds. Production trading is disabled by default and requires an explicit Super Admin activation with a written risk acknowledgement." },
   { q: "Does AI TradePilot guarantee profits?", a: "No. No trading system can guarantee returns. Signals are deterministic rule-based calculations, not predictions, and every trade can lose money." },
   { q: "Do you store my Binance API secret in plain text?", a: "No. Secrets are encrypted with Fernet and only the last 4 characters of the key are ever displayed." },
-  { q: "Can I cancel anytime?", a: "Yes. Plans are month-to-month and there is a free plan with scanner access and no auto-trading." },
+  { q: "Can I cancel anytime?", a: "There are no plans, subscriptions or payments — every account gets full access, including automatic AI trading, at no cost. You can stop the bot and disconnect Binance at any time." },
 ];
 
 export default function LandingPage() {
@@ -40,7 +40,7 @@ export default function LandingPage() {
             <Link href="/register"><Button size="lg">Start free on Testnet <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/how-it-works"><Button size="lg" variant="outline">How it works</Button></Link>
           </div>
-          <p className="mt-4 text-xs text-muted">No card required for the Free plan. Trading involves substantial risk of loss.</p>
+          <p className="mt-4 text-xs text-muted">No card required. No plans, no subscriptions — every account gets full access. Trading involves substantial risk of loss.</p>
         </section>
 
         <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
@@ -76,23 +76,21 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">Simple pricing</h2>
-          <p className="mt-2 text-center text-muted">Start free. Upgrade when you need auto-trading and more positions. Checkout is coming soon.</p>
-          <div className="mt-8 grid gap-4 md:grid-cols-4">
+          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">Direct AI auto-trading — no plans, no limits</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-center text-muted">Every account gets full access: the AI scanner finds signals and the bot trades them automatically, with a stop-loss on every trade and leverage kept between 10x and 50x.</p>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
             {[
-              { name: "Free", price: "$0", desc: "Scanner access, 1 position, 2x leverage.", cta: "Start free" },
-              { name: "Basic", price: "$19/mo", desc: "Auto-trading, 2 positions, 3x leverage.", cta: "Choose Basic" },
-              { name: "Pro", price: "$49/mo", desc: "Auto-trading, 5 positions, 5x leverage.", cta: "Choose Pro" },
-              { name: "Premium", price: "$99/mo", desc: "Auto-trading, 10 positions, 10x leverage.", cta: "Choose Premium" },
-            ].map((p) => (
-              <Card key={p.name} className={p.name === "Pro" ? "border-blue-500/60" : undefined}>
-                <CardHeader><CardTitle>{p.name}</CardTitle><p className="text-2xl font-bold text-white">{p.price}</p></CardHeader>
-                <CardContent><CardDescription>{p.desc}</CardDescription>
-                  <Link href="/pricing" className="mt-4 block"><Button variant={p.name === "Pro" ? "default" : "outline"} className="w-full">{p.cta}</Button></Link>
-                </CardContent>
+              { title: "Automatic execution", desc: "Signals are executed as soon as they pass your risk filters — no manual orders, no waiting." },
+              { title: "Leverage 10–50x", desc: "Every trade uses leverage between 10x and 50x, set from your bot settings (default 20x)." },
+              { title: "Stop-loss on every trade", desc: "A reduce-only stop-loss — and a take-profit — is attached to every position the bot opens." },
+            ].map((f) => (
+              <Card key={f.title}>
+                <CardHeader><CardTitle>{f.title}</CardTitle></CardHeader>
+                <CardContent><CardDescription>{f.desc}</CardDescription></CardContent>
               </Card>
             ))}
           </div>
+          <div className="mt-8 text-center"><Link href="/register"><Button size="lg">Start trading <ArrowRight className="h-4 w-4" /></Button></Link></div>
         </section>
 
         <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6">

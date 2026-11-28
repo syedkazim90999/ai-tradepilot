@@ -35,11 +35,11 @@ class Settings(BaseSettings):
     binance_prod_ws_url: str = "wss://fstream.binance.com"
     binance_use_testnet: bool = True
 
-    # Trading defaults (conservative)
+    # Trading defaults
     risk_per_trade_pct: float = 0.5
     daily_loss_limit_pct: float = 2.0
     max_positions: int = 2
-    max_leverage: int = 2
+    max_leverage: int = 20
     reward_risk_ratio: float = 2.0
 
     @property
