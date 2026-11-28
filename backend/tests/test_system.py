@@ -109,6 +109,31 @@ def test_celery_beat_schedule_lists_scanner_and_reconcile():
     assert beat["scanner-every-5-min"]["task"] == "app.worker.tasks.run_scanner"
 
 
+def test_celery_worker_tasks_registered_via_include():
+    """Regression: the worker connected and beat dispatched
+    app.worker.tasks.run_scanner every 5 min, but the worker discarded
+    every dispatch as an unregistered task ("Received unregistered task
+    of type 'app.worker.tasks.run_scanner'") and its [tasks] list was
+    empty. Root cause: celery_app had no `include`, so the worker never
+    imported app.worker.tasks. The beat schedule alone does not register
+    tasks. The worker imports conf.include modules at startup
+    (celery/worker/worker.py, via loader.import_task_module); assert the
+    include lists the tasks module and that importing it the way the
+    worker does registers both tasks, including the ones the beat
+    schedule points at."""
+    from app.worker.celery_app import celery_app
+    assert "app.worker.tasks" in (celery_app.conf.include or [])
+    # Replicate the worker's startup import:
+    for m in celery_app.conf.include:
+        celery_app.loader.import_task_module(m)
+    names = set(celery_app.tasks.keys())
+    assert "app.worker.tasks.run_scanner" in names
+    assert "app.worker.tasks.reconcile_positions" in names
+    beat = celery_app.conf.beat_schedule
+    assert beat["scanner-every-5-min"]["task"] in names
+    assert beat["reconcile-positions-every-15-min"]["task"] in names
+
+
 def test_celery_redis_broker_forces_resp2_for_rediss_url():
     """With a rediss:// (Upstash) broker URL the Celery broker must use
     RESP2 (protocol=2). redis-py 6.x otherwise negotiates RESP3

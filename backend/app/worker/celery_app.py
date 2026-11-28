@@ -123,6 +123,14 @@ celery_app = Celery(
     "tradepilot",
     broker=_celery_redis_url(),
     backend=_celery_redis_url(),
+    # Register the worker tasks. Without this the worker starts with an
+    # EMPTY [tasks] list: beat dispatches "app.worker.tasks.run_scanner"
+    # every 5 min and the worker discards it as an unregistered task
+    # ("Received unregistered task of type ..."). The beat schedule alone
+    # does not register tasks -- the module must be imported. Celery
+    # imports `include` lazily (on finalize / worker start), so there is
+    # no circular import with app.worker.tasks, which imports celery_app.
+    include=["app.worker.tasks"],
 )
 celery_app.conf.update(
     task_serializer="json",
