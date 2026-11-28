@@ -86,7 +86,7 @@ class ExchangeConnection(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=_pk)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
     exchange: Mapped[str] = mapped_column(String(32), default="binance_futures", nullable=False)
-    environment: Mapped[str] = mapped_column(String(16), default="testnet", nullable=False)  # testnet|live
+    environment: Mapped[str] = mapped_column(String(16), default="live", nullable=False)  # live|testnet
     api_key_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
     api_secret_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
     api_key_last4: Mapped[str] = mapped_column(String(8), nullable=False)
@@ -174,7 +174,7 @@ class Trade(Base):
     realized_pnl: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     fees: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     funding_fees: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
-    environment: Mapped[str] = mapped_column(String(16), default="testnet", nullable=False)
+    environment: Mapped[str] = mapped_column(String(16), default="live", nullable=False)
     opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
@@ -198,7 +198,7 @@ class Order(Base):
     executed_qty: Mapped[Decimal] = mapped_column(Numeric(20, 8), default=Decimal("0"), nullable=False)
     avg_price: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     reduce_only: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    environment: Mapped[str] = mapped_column(String(16), default="testnet", nullable=False)
+    environment: Mapped[str] = mapped_column(String(16), default="live", nullable=False)
     raw_response: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, nullable=False)
@@ -220,7 +220,7 @@ class Position(Base):
     unrealized_pnl: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     liquidation_price: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
     is_open: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    environment: Mapped[str] = mapped_column(String(16), default="testnet", nullable=False)
+    environment: Mapped[str] = mapped_column(String(16), default="live", nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now, nullable=False)
 
     user = relationship("User", back_populates="positions")

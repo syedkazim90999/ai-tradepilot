@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AI TradePilot — AI-Powered Binance Futures Trading",
-  description: "Rule-based AI-assisted automated trading on Binance Futures. Testnet by default. No guaranteed returns — trading involves substantial risk of loss.",
+  description: "Rule-based AI-assisted automated trading on Binance Futures — live, with real money at risk. No guaranteed returns — trading involves substantial risk of loss.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

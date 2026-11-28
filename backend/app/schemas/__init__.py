@@ -76,7 +76,7 @@ class SessionOut(BaseModel):
 class ConnectionCreate(BaseModel):
     api_key: str = Field(min_length=8)
     api_secret: str = Field(min_length=8)
-    environment: str = "testnet"
+    environment: str = "live"
     label: str | None = None
 
 

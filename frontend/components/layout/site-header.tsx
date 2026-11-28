@@ -23,7 +23,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600"><CandlestickChart className="h-5 w-5 text-white" /></span>
           <span className="text-lg font-bold text-white">AI TradePilot</span>
-          <span className="hidden rounded-full bg-blue-600/20 px-2 py-0.5 text-[11px] font-semibold text-blue-300 sm:inline">Testnet</span>
+          <span className="hidden rounded-full bg-amber-600/20 px-2 py-0.5 text-[11px] font-semibold text-amber-300 sm:inline">Live</span>
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (

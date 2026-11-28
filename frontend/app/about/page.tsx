@@ -15,7 +15,7 @@ export default function AboutPage() {
       </p>
       <h2 className="text-xl font-semibold text-white">What we believe</h2>
       <ul className="list-disc space-y-2 pl-5">
-        <li><strong className="text-white">Testnet first.</strong> Nobody should risk real money while learning a system. Production trading is disabled by default.</li>
+        <li><strong className="text-white">Live trading, real money.</strong> This platform trades live on Binance Futures with real funds. Only use money you can afford to lose, and understand leverage before enabling the bot.</li>
         <li><strong className="text-white">No guaranteed returns.</strong> Any service that promises profits from trading is misleading you. We show your real numbers — wins and losses.</li>
         <li><strong className="text-white">Your keys, your control.</strong> API keys are encrypted, masked, and never given withdrawal permission. You can disconnect at any time.</li>
         <li><strong className="text-white">Transparency over hype.</strong> Signals are deterministic rules you can inspect — the supporting and invalidating conditions are shown with every signal.</li>

@@ -1,6 +1,7 @@
 """Binance Futures client (httpx + websockets).
-Testnet is the default. Production is DISABLED unless live_trading_enabled is
-explicitly activated by the Super Admin (see services/trading.py guard).
+Live production is the default. Live orders are still gated: they require
+live_trading_enabled to be explicitly activated by the Super Admin
+(see services/trading.py guard). Testnet is not offered.
 Public endpoints need no credentials. Private endpoints use HMAC-SHA256 signing.
 """
 import asyncio
@@ -40,7 +41,7 @@ class BinanceError(Exception):
 
 
 class BinanceClient:
-    def __init__(self, api_key: str = "", api_secret: str = "", testnet: bool = True):
+    def __init__(self, api_key: str = "", api_secret: str = "", testnet: bool = False):
         s = get_settings()
         self.testnet = testnet
         self.base_url = s.binance_testnet_base_url if testnet else s.binance_prod_base_url

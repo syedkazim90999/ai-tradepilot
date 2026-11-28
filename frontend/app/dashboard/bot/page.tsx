@@ -59,7 +59,7 @@ export default function BotPage() {
 
   return (
     <div>
-      <PageHeader title="Trading bot" description="Configure risk limits and execution. Conservative Testnet defaults are pre-filled."
+      <PageHeader title="Trading bot" description="Configure risk limits and execution. Trading is live with real money — a 2% adverse move can liquidate a 50x position."
         action={s ? (
           <Button variant={s.is_enabled ? "destructive" : "success"} onClick={toggle} disabled={toggling || s.is_paused}>
             {s.is_enabled ? <><Pause className="h-4 w-4" /> Stop bot</> : <><Play className="h-4 w-4" /> Start bot</>}

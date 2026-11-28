@@ -12,11 +12,11 @@ const FEATURES = [
   { icon: ShieldCheck, title: "Risk management first", text: "Stop-loss and take-profit on every trade, leverage 10–50x, and a global pause. No LLM ever places an order." },
   { icon: KeyRound, title: "Encrypted API keys", text: "Your Binance keys are encrypted at rest, shown masked, and withdrawal permission is refused on validation." },
   { icon: BarChart3, title: "Trade analytics", text: "Realized P&L, trade history, open positions and signal history — all from your own account data." },
-  { icon: Wallet, title: "Testnet by default", text: "Practice on Binance Futures Testnet with no real money at risk. Production trading stays disabled until explicitly activated." },
+  { icon: Wallet, title: "Live real-money trading", text: "Trades live on Binance Futures with real money. The bot can trade but can never withdraw funds — your API key must have withdrawals OFF." },
 ];
 
 const FAQS = [
-  { q: "Is my money at risk?", a: "On Testnet, no — you trade with test funds. Production trading is disabled by default and requires an explicit Super Admin activation with a written risk acknowledgement." },
+  { q: "Is my money at risk?", a: "Yes — this is LIVE trading on Binance Futures with real money at risk. There is no Testnet mode. Live trading is activated by the Super Admin with a written risk acknowledgement. Leveraged trading can lose your entire margin — a 2% adverse move can liquidate a 50x position." },
   { q: "Does AI TradePilot guarantee profits?", a: "No. No trading system can guarantee returns. Signals are deterministic rule-based calculations, not predictions, and every trade can lose money." },
   { q: "Do you store my Binance API secret in plain text?", a: "No. Secrets are encrypted with Fernet and only the last 4 characters of the key are ever displayed." },
   { q: "Can I cancel anytime?", a: "There are no plans, subscriptions or payments — every account gets full access, including automatic AI trading, at no cost. You can stop the bot and disconnect Binance at any time." },
@@ -28,16 +28,16 @@ export default function LandingPage() {
       <SiteHeader />
       <main>
         <section className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6">
-          <span className="inline-block rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-300">Binance Futures Testnet — default &amp; free to try</span>
+          <span className="inline-block rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">Binance Futures — LIVE, real money at risk</span>
           <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-6xl">
             AI-assisted trading on Binance Futures, with risk first.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted">
             AI TradePilot scans the market, scores rule-based signals and automates execution with strict stop-losses,
-            leverage caps and daily loss limits. Start on Testnet — no real money at risk.
+            leverage caps and daily loss limits. Live trading with real money — the bot trades automatically and can never withdraw funds.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/register"><Button size="lg">Start free on Testnet <ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href="/register"><Button size="lg">Start trading live <ArrowRight className="h-4 w-4" /></Button></Link>
             <Link href="/how-it-works"><Button size="lg" variant="outline">How it works</Button></Link>
           </div>
           <p className="mt-4 text-xs text-muted">No card required. No plans, no subscriptions — every account gets full access. Trading involves substantial risk of loss.</p>
@@ -61,7 +61,7 @@ export default function LandingPage() {
             <div className="mt-8 grid gap-4 md:grid-cols-4">
               {[
                 { n: "1", t: "Create an account", d: "Register and verify your email." },
-                { n: "2", t: "Connect Binance Testnet", d: "Add a Testnet API key — encrypted and masked, never shown in full." },
+                { n: "2", t: "Connect Binance (live)", d: "Add your live Binance Futures API key — encrypted and masked, never shown in full. Create it with Futures trading ON and withdrawals OFF." },
                 { n: "3", t: "Configure the bot", d: "Set risk per trade, leverage, max positions and your symbols." },
                 { n: "4", t: "Review signals & trades", d: "The scanner generates signals; the bot executes within your limits." },
               ].map((s) => (
@@ -107,6 +107,7 @@ export default function LandingPage() {
         <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
           <Alert variant="warning" title="Risk disclosure">
             Trading cryptocurrencies and derivatives involves substantial risk of loss and is not suitable for every investor.
+            This is live trading with real money — leveraged trading can lose your entire margin, and a 2% adverse move can liquidate a 50x position.
             AI TradePilot provides rule-based signals and automation tools — it does not provide financial advice and does not guarantee returns.
             Read the full <Link href="/risk-disclosure" className="underline">Risk Disclosure</Link> before trading.
           </Alert>

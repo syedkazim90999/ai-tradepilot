@@ -28,12 +28,12 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:3000,http://localhost:8000"
 
-    # Binance — Testnet is the default. Production is DISABLED unless explicitly activated.
+    # Binance — LIVE production is the default. Testnet is not offered.
     binance_testnet_base_url: str = "https://testnet.binancefuture.com"
     binance_testnet_ws_url: str = "wss://stream.binancefuture.com"
     binance_prod_base_url: str = "https://fapi.binance.com"
     binance_prod_ws_url: str = "wss://fstream.binance.com"
-    binance_use_testnet: bool = True
+    binance_use_testnet: bool = False
 
     # Trading defaults
     risk_per_trade_pct: float = 0.5

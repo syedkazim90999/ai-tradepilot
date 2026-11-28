@@ -17,8 +17,8 @@ export default function RiskDisclosurePage() {
       <p>Orders may fill at worse prices than expected (slippage), stop-losses may not execute at the intended price in fast markets, and exchange or network outages can prevent orders from being placed or cancelled.</p>
       <h2 className="text-xl font-semibold text-white">5. Automation risk</h2>
       <p>Automated trading runs without human review of each order. Software defects, configuration errors, stale data or API failures can cause unintended trades. Always review your bot settings and monitor open positions.</p>
-      <h2 className="text-xl font-semibold text-white">6. Testnet default</h2>
-      <p>AI TradePilot defaults to Binance Futures Testnet, where funds have no real value. Production trading is disabled by default and requires an explicit Super Admin activation. Activating live trading means real money is at risk — do not do so with money you cannot afford to lose.</p>
+      <h2 className="text-xl font-semibold text-white">6. Live trading — real money</h2>
+      <p>AI TradePilot trades LIVE on Binance Futures with real money. There is no Testnet mode. Live trading requires an explicit Super Admin activation. Real money is at risk — do not trade with money you cannot afford to lose. At 50x leverage, a 2% adverse price move can liquidate your entire position.</p>
       <h2 className="text-xl font-semibold text-white">7. No advice, no guarantees</h2>
       <p>AI TradePilot provides tools, not financial advice, and makes no guarantee of returns. Seek independent advice if you are unsure whether leveraged crypto trading is appropriate for you.</p>
     </PublicLayout>

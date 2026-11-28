@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const FAQS = [
   { q: "What is AI TradePilot?", a: "An AI-assisted automated trading platform for Binance Futures. It scans the market with technical indicators, generates rule-based signals, and can execute trades automatically within risk limits you set." },
-  { q: "Is my money at risk?", a: "On Testnet, no — you trade with test funds that have no real value. Production (live) trading is disabled by default and requires an explicit Super Admin activation with a written risk acknowledgement. Even then, all trading risks real loss." },
+  { q: "Is my money at risk?", a: "Yes — this is LIVE trading on Binance Futures with real money at risk. There is no Testnet mode. Live trading requires an explicit Super Admin activation with a written risk acknowledgement. Leveraged trading can lose your entire margin — a 2% adverse move can liquidate a 50x position." },
   { q: "Does AI TradePilot guarantee profits?", a: "No, and no honest trading service can. Signals are deterministic rules, not predictions. Markets can move against any position, and leveraged trading can lose money quickly." },
   { q: "How are my Binance API keys stored?", a: "They are encrypted with Fernet before being stored in the database. The dashboard only ever shows the last 4 characters of your key. Keys with withdrawal permission are refused during validation." },
   { q: "What happens if the bot loses money?", a: "Losses are limited by your configuration: risk per trade, daily loss limit, max positions and leverage caps. A daily loss limit stops new trades for the day, and you can pause the bot at any time." },

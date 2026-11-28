@@ -36,7 +36,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <AuthLayout title="Create your account" description="Start free on Binance Futures Testnet."
+    <AuthLayout title="Create your account" description="Create your account to trade live on Binance Futures."
       footer={<>Already have an account? <Link href="/login" className="text-blue-400 hover:underline">Sign in</Link></>}>
       {devToken ? (
         <div className="space-y-4">

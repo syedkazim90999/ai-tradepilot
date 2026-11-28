@@ -54,7 +54,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       })}
       <div className="mt-4 rounded-lg border border-border bg-[#0D1424] p-3 text-xs leading-relaxed text-muted">
         <ShieldCheck className="mb-1 h-4 w-4 text-green-400" />
-        Testnet by default. Production trading is disabled unless a Super Admin explicitly activates it.
+        Live trading on Binance Futures with real money. Live orders require Super Admin activation — and the bot can never withdraw funds.
       </div>
     </nav>
   );

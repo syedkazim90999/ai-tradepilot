@@ -10,7 +10,7 @@ export function SiteFooter() {
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600"><CandlestickChart className="h-5 w-5 text-white" /></span>
             <span className="text-lg font-bold text-white">AI TradePilot</span>
           </div>
-          <p className="mt-3 text-sm text-muted">Rule-based AI-assisted trading on Binance Futures. Testnet by default — practice without risking real money.</p>
+          <p className="mt-3 text-sm text-muted">Rule-based AI-assisted trading on Binance Futures. Live trading — real money at risk.</p>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">Product</h3>
@@ -41,7 +41,7 @@ export function SiteFooter() {
       <div className="border-t border-border px-4 py-5">
         <p className="mx-auto max-w-7xl text-center text-xs leading-relaxed text-muted">
           Trading cryptocurrencies and derivatives involves substantial risk of loss and is not suitable for every investor.
-          AI TradePilot runs on Binance Futures Testnet by default and makes no guarantee of returns. Past performance does not predict future results.
+          AI TradePilot trades live on Binance Futures with real money and makes no guarantee of returns. Past performance does not predict future results.
           Never trade with money you cannot afford to lose.
         </p>
         <p className="mt-2 text-center text-xs text-muted">© {new Date().getFullYear()} AI TradePilot. All rights reserved.</p>

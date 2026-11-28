@@ -69,7 +69,7 @@ export default function DashboardOverviewPage() {
       ) : null}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Price chart</CardTitle><CardDescription>Live candles from Binance Testnet for {data?.latest_signals?.[0]?.symbol || "your latest signal"}.</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Price chart</CardTitle><CardDescription>Live candles from Binance Futures for {data?.latest_signals?.[0]?.symbol || "your latest signal"}.</CardDescription></CardHeader>
           <CardContent><PriceChart candles={candles} symbol={data?.latest_signals?.[0]?.symbol} entry={data?.latest_signals?.[0]?.entry_price ? Number(data.latest_signals[0].entry_price) : null} stopLoss={data?.latest_signals?.[0]?.stop_loss ? Number(data.latest_signals[0].stop_loss) : null} takeProfit={data?.latest_signals?.[0]?.take_profit ? Number(data.latest_signals[0].take_profit) : null} /></CardContent>
         </Card>
         <Card>

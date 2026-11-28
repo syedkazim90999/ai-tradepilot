@@ -21,7 +21,7 @@ export default function ConnectionsPage() {
   const [notice, setNotice] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
-  const [env, setEnv] = useState("testnet");
+  const [env, setEnv] = useState("production");
   const [label, setLabel] = useState("");
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -68,20 +68,19 @@ export default function ConnectionsPage() {
       {notice && <Alert variant="success" className="mb-4">{notice}</Alert>}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Add a connection</CardTitle><CardDescription>Use a Testnet key first. Never enable withdrawal permission on any key you connect.</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Add a connection</CardTitle><CardDescription>Connect your live Binance Futures API key. Real money — the bot trades, but it can never withdraw funds.</CardDescription></CardHeader>
           <CardContent>
             <form onSubmit={add} className="space-y-4">
               <div className="space-y-2"><Label htmlFor="env">Environment</Label>
                 <Select id="env" value={env} onChange={(e) => setEnv(e.target.value)}>
-                  <option value="testnet">Testnet (recommended — no real money)</option>
-                  <option value="production">Production (real money — live trading disabled by default)</option>
+                  <option value="production">Live (real money — Binance Futures)</option>
                 </Select>
               </div>
-              <div className="space-y-2"><Label htmlFor="label">Label</Label><Input id="label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Main Testnet" /></div>
+              <div className="space-y-2"><Label htmlFor="label">Label</Label><Input id="label" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Main Binance" /></div>
               <div className="space-y-2"><Label htmlFor="apiKey">API key</Label><Input id="apiKey" value={apiKey} onChange={(e) => setApiKey(e.target.value)} required minLength={8} autoComplete="off" placeholder="Paste your Binance API key" /></div>
               <div className="space-y-2"><Label htmlFor="apiSecret">API secret</Label><Input id="apiSecret" type="password" value={apiSecret} onChange={(e) => setApiSecret(e.target.value)} required minLength={8} autoComplete="off" placeholder="Paste your Binance API secret" /></div>
-              <Alert variant="warning" title="Key safety">
-                Create the key with read + trade permissions only. Keys with withdrawal permission are refused during validation. Rotate or delete a key here if it is ever exposed.
+              <Alert variant="warning" title="Create the key correctly on Binance">
+                On binance.com, create the API key with Futures trading ON and Withdrawals OFF. The bot can place trades but can never withdraw your funds — withdrawal permission is refused during validation. Use only money you can afford to lose; leveraged trading can lose your entire margin.
               </Alert>
               <Button type="submit" disabled={saving}>{saving ? "Adding…" : "Add connection"}</Button>
             </form>
@@ -91,7 +90,7 @@ export default function ConnectionsPage() {
           <CardHeader><CardTitle>Your connections</CardTitle><CardDescription>{loading ? "Loading…" : `${conns.length} connection${conns.length === 1 ? "" : "s"}`}</CardDescription></CardHeader>
           <CardContent>
             {loading ? <TableSkeleton /> : conns.length === 0 ? (
-              <EmptyState title="No connections yet" description="Add your Binance Testnet API key to start. Until then the scanner and bot have no exchange account to trade on." />
+              <EmptyState title="No connections yet" description="Add your live Binance Futures API key to start. Until then the scanner and bot have no exchange account to trade on." />
             ) : (
               <div className="space-y-3">
                 {conns.map((c) => (
@@ -100,7 +99,7 @@ export default function ConnectionsPage() {
                       <div className="flex items-center gap-2">
                         <KeyRound className="h-4 w-4 text-blue-400" />
                         <span className="font-medium text-white">{c.label || "Binance connection"}</span>
-                        <Badge variant={c.environment === "testnet" ? "default" : "warning"}>{c.environment}</Badge>
+                        <Badge variant={c.environment === "testnet" ? "default" : "warning"}>{c.environment === "testnet" ? "Testnet" : "Live"}</Badge>
                         <Badge variant={c.is_active ? "success" : "secondary"}>{c.is_active ? "Active" : "Inactive"}</Badge>
                       </div>
                       <code className="text-xs text-muted">{c.api_key_masked}</code>

@@ -19,7 +19,7 @@ export function AuthLayout({ title, description, children, footer }: {
           <CardContent>{children}{footer && <div className="mt-6 border-t border-border pt-4 text-center text-sm text-muted">{footer}</div>}</CardContent>
         </Card>
       </main>
-      <p className="px-4 pb-6 text-center text-xs text-muted">Trading involves substantial risk of loss. Testnet by default — no guaranteed returns.</p>
+      <p className="px-4 pb-6 text-center text-xs text-muted">Trading involves substantial risk of loss. Live trading — real money at risk. No guaranteed returns.</p>
     </div>
   );
 }

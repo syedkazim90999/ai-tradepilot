@@ -18,7 +18,7 @@ KLINES_FIXTURE = [[1700000000000, "60000", "60100", "59900", "60050", "12.5",
                    1700003599999, "750000", 100, "6", "375000", "0"]]
 
 
-def test_klines_endpoint_uses_public_testnet_klines(client):
+def test_klines_endpoint_uses_public_klines(client):
     _, _, tok, _ = register_and_login(client)
     with patch("app.api.routes.market.BinanceClient") as MockClient:
         inst = MockClient.return_value.__aenter__.return_value
