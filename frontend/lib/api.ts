@@ -97,6 +97,7 @@ export interface ConnectionOut {
 }
 export interface BotSettingsOut {
   user_id: string; is_enabled: boolean; is_paused: boolean; risk_per_trade_pct: number;
+  min_risk_usd: number;
   daily_loss_limit_pct: number; max_positions: number; max_leverage: number;
   reward_risk_ratio: number; trading_enabled: boolean; symbols: string[] | null;
 }

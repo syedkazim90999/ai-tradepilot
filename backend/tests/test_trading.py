@@ -105,6 +105,65 @@ def test_position_size_capped_by_leverage(client):
     assert d.position_size * Decimal("60000") <= Decimal("2000")
 
 
+def test_min_risk_usd_floor_applies_on_small_account(client):
+    """$2 minimum risk per trade: on a $10 account 0.5% is only $0.05,
+    so the floor raises the risk to $2.00 and the position is sized from $2."""
+    email, _, tok, _ = register_and_login(client)
+    user_id = get_user(email).id
+
+    async def _check():
+        from tests.conftest import _Session
+        async with _Session() as s:
+            # equity 10, risk 0.5% = 0.05 -> floored to 2; stop distance 2000 -> size 0.001
+            d = await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10"),
+                                          Decimal("60000"), Decimal("58000"), 10)
+            return d
+    d = run(_check())
+    assert d.allowed is True
+    assert d.position_size == Decimal("0.001")
+
+
+def test_min_risk_usd_floor_not_applied_when_pct_risk_exceeds_it(client):
+    """On a large account the percentage risk ($50 on $10,000) exceeds the
+    $2 floor, so the percentage applies and the floor changes nothing."""
+    email, _, tok, _ = register_and_login(client)
+    user_id = get_user(email).id
+
+    async def _check():
+        from tests.conftest import _Session
+        async with _Session() as s:
+            # equity 10000, risk 0.5% = 50 > 2; stop distance 1000 -> size 0.05
+            d = await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10000"),
+                                          Decimal("60000"), Decimal("59000"), 10)
+            return d
+    d = run(_check())
+    assert d.allowed is True
+    assert d.position_size == Decimal("0.05")
+
+
+def test_min_risk_usd_margin_cap_still_limits(client):
+    """The equity x leverage notional cap takes precedence over the $2 floor:
+    when the floored risk would need more margin than the account has, the
+    position is capped and the actual risk is lower."""
+    email, _, tok, _ = register_and_login(client)
+    user_id = get_user(email).id
+
+    async def _check():
+        from tests.conftest import _Session
+        async with _Session() as s:
+            # equity 10, risk floored to 2; stop distance 100 -> uncapped size
+            # 0.02, notional 1000 > max notional 10*10=100, so it is capped
+            # to 100/50000 = 0.002.
+            d = await check_trade_allowed(s, user_id, "BTCUSDT", Decimal("10"),
+                                          Decimal("50000"), Decimal("49900"), 10)
+            return d
+    d = run(_check())
+    assert d.allowed is True
+    assert d.position_size == Decimal("0.002")
+    assert d.position_size * Decimal("50000") <= Decimal("100")
+    assert d.position_size < Decimal("0.02")
+
+
 def test_daily_loss_no_longer_blocks(client):
     """No daily-loss halt by design: even after losing 2.5% of equity today,
     the next trade is still allowed. The per-trade stop loss is the loss

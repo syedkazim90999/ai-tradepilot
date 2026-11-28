@@ -100,6 +100,7 @@ class ConnectionOut(BaseModel):
 class BotSettingsIn(BaseModel):
     is_enabled: bool | None = None
     risk_per_trade_pct: Decimal | None = None
+    min_risk_usd: Decimal | None = None
     daily_loss_limit_pct: Decimal | None = None
     max_positions: int | None = Field(default=None, ge=1, le=10)
     max_leverage: int | None = Field(default=None, ge=10, le=50)
@@ -113,6 +114,7 @@ class BotSettingsOut(BaseModel):
     is_enabled: bool
     is_paused: bool
     risk_per_trade_pct: Decimal
+    min_risk_usd: Decimal
     daily_loss_limit_pct: Decimal
     max_positions: int
     max_leverage: int

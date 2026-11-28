@@ -37,6 +37,7 @@ class Settings(BaseSettings):
 
     # Trading defaults
     risk_per_trade_pct: float = 0.5
+    min_risk_usd: float = 2.0
     daily_loss_limit_pct: float = 2.0
     max_positions: int = 5
     max_leverage: int = 20

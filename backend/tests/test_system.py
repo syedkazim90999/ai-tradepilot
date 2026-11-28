@@ -50,8 +50,10 @@ def _run_alembic(db_path: str, *args: str):
 
 
 def test_alembic_upgrade_downgrade_scratch_db(tmp_path):
-    """Upgrade to head creates contact_messages; downgrade one step removes it;
-    upgrade again restores it. Runs on a scratch SQLite file, never the dev DB."""
+    """Upgrade to head creates contact_messages and the min_risk_usd column;
+    downgrade one step removes only the newest revision; downgrade another
+    removes contact_messages; upgrade again restores both. Runs on a scratch
+    SQLite file, never the dev DB."""
     db_path = str(tmp_path / "scratch.db")
     _run_alembic(db_path, "upgrade", "head")
     con = sqlite3.connect(db_path)
@@ -59,18 +61,29 @@ def test_alembic_upgrade_downgrade_scratch_db(tmp_path):
     assert "contact_messages" in tables
     assert "users" in tables
     assert "market_signals" in tables
+    cols = {r[1] for r in con.execute("PRAGMA table_info(bot_settings)")}
+    assert "min_risk_usd" in cols
     con.close()
+    _run_alembic(db_path, "downgrade", "-1")
+    con = sqlite3.connect(db_path)
+    tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    cols = {r[1] for r in con.execute("PRAGMA table_info(bot_settings)")}
+    con.close()
+    assert "min_risk_usd" not in cols
+    assert "contact_messages" in tables  # only the newest revision was rolled back
     _run_alembic(db_path, "downgrade", "-1")
     con = sqlite3.connect(db_path)
     tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     con.close()
     assert "contact_messages" not in tables
-    assert "users" in tables  # only the newest revision was rolled back
+    assert "users" in tables
     _run_alembic(db_path, "upgrade", "head")
     con = sqlite3.connect(db_path)
     tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    cols = {r[1] for r in con.execute("PRAGMA table_info(bot_settings)")}
     con.close()
     assert "contact_messages" in tables
+    assert "min_risk_usd" in cols
 
 
 def test_worker_scan_task_propagates_error_for_loop_recovery(monkeypatch):

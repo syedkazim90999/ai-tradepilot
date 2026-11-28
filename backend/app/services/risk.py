@@ -35,6 +35,7 @@ async def get_effective_settings(db: AsyncSession, user_id) -> BotSettings:
         settings = BotSettings(
             user_id=user_id,
             risk_per_trade_pct=Decimal(str(s.risk_per_trade_pct)),
+            min_risk_usd=Decimal(str(s.min_risk_usd)),
             daily_loss_limit_pct=Decimal(str(s.daily_loss_limit_pct)),
             max_positions=s.max_positions,
             max_leverage=s.max_leverage,
@@ -87,8 +88,17 @@ async def check_trade_allowed(db: AsyncSession, user_id, symbol: str, equity: De
     # NOTE: no daily-loss halt by design. A losing day does not stop the bot;
     # each trade's loss is capped by its own stop loss.
 
-    # Position sizing: risk_amount = equity * risk% ; size = risk / |entry - stop|
-    risk_amount = equity * settings.risk_per_trade_pct / 100
+    # Position sizing: risk_amount = max(equity * risk%, min_risk_usd);
+    # size = risk / |entry - stop|. The $2 floor keeps a small account from
+    # trading dust-sized positions (0.5% of $10 is only $0.05); the risk
+    # scales up with equity once the percentage exceeds the floor. The
+    # equity x leverage notional cap below still takes precedence: if the
+    # floored risk would need more margin than the account has, the
+    # position is capped and the actual risk is lower.
+    min_risk = settings.min_risk_usd
+    if min_risk is None:
+        min_risk = Decimal(str(get_settings().min_risk_usd))
+    risk_amount = max(equity * settings.risk_per_trade_pct / 100, min_risk)
     stop_distance = abs(entry - stop_loss)
     if stop_distance <= 0:
         return RiskDecision(False, "Invalid stop distance")
